@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Viewer</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-muted: #f8fbff;
+  --surface-alt: #eef5ff;
+  --text: #172033;
+  --text-muted: #667085;
+  --border: #d8e0ea;
+  --accent: #0f766e;
+  --accent-strong: #0b5f59;
+  --title-bg-start: #0f766e;
+  --title-bg-end: #0b5f59;
+  --shadow: 0 18px 45px rgba(24, 39, 75, 0.12);
+}
+
+body[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #10151f;
+  --surface: #171f2d;
+  --surface-muted: #1d2838;
+  --surface-alt: #202d40;
+  --text: #eef4ff;
+  --text-muted: #aab7ca;
+  --border: #314056;
+  --accent: #5eead4;
+  --accent-strong: #99f6e4;
+  --title-bg-start: #1d2838;
+  --title-bg-end: #26364c;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.38);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.15), transparent 30%),
+    linear-gradient(135deg, var(--bg), var(--surface-muted));
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  padding: 32px 18px;
+}
+
+.app-shell {
+  margin: 0 auto;
+  max-width: 680px;
+}
+
+.topbar {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin: 0 auto 18px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.theme-toggle {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(24, 39, 75, 0.08);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+div.tablecontainer {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0;
+  min-width: 560px;
+  width: 100%;
+}
+
+table, th, td {
+  border: 0;
+  padding: 11px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+thead th {
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+thead tr:first-child th {
+  background: linear-gradient(135deg, var(--title-bg-start), var(--title-bg-end));
+  color: #ffffff;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+tbody tr:nth-child(odd) {
+  background: var(--surface);
+}
+
+tbody tr:nth-child(even) {
+  background: var(--surface-alt);
+}
+
+tbody tr:hover {
+  background: rgba(15, 118, 110, 0.12);
+}
+
+td:first-child {
+  font-weight: 700;
+}
+
+input {
+  background: transparent;
+  border-style: none;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+.time-field {
+  width: 90px;
+}
+
+.date-field {
+  width: 150px;
+}
+
+.cet-change-note {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  line-height: 1.55;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  width: 100%;
+}
+
+.cet-change-note strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.cet-change-line {
+  display: block;
+  margin-top: 2px;
+}
+
+.config-error {
+  color: #b00020;
+  font-weight: bold;
+}
+
+body[data-theme="dark"] .config-error {
+  color: #fca5a5;
+}
+
+@media (max-width: 680px) {
+  body {
+    padding: 20px 12px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+
+<main class="app-shell">
+  <header class="topbar">
+    <div>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">Dark Theme</button>
+  </header>
+
+  <div id="cetChangeNote" class="cet-change-note" aria-live="polite"></div>
+
+  <div class="tablecontainer">
+    <table>
+      <thead>
+        <tr>
+          <th id="viewerTitle" colspan="3">Time Viewer</th>
+        </tr>
+        <tr>
+          <th>Country/Client</th>
+          <th>Current Time</th>
+          <th>Current Date</th>
+        </tr>
+      </thead>
+      <tbody id="clockRows">
+        <tr>
+          <td colspan="3">Loading time viewer configuration...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script src="time-viewer.config.json"></script>
+<script>
+const CONFIG_FILE = "time-viewer.config.json";
+const CET_ZONE = "Europe/Copenhagen";
+const THEME_KEY = "dms-time-viewer-theme";
+const DYNAMIC_UTC_ZONES = {
+  "CET/CEST": CET_ZONE
+};
+let timeViewerConfig = null;
+let timerId = null;
+
+document.querySelector("#themeToggle").addEventListener("click", toggleTheme);
+
+function loadTheme() {
+  const storedTheme = localStorage.getItem(THEME_KEY);
+  const theme = storedTheme === "dark" ? "dark" : "light";
+  applyTheme(theme);
+}
+
+function toggleTheme() {
+  const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, nextTheme);
+  applyTheme(nextTheme);
+}
+
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  const isDark = theme === "dark";
+  const button = document.querySelector("#themeToggle");
+  button.textContent = isDark ? "Light Theme" : "Dark Theme";
+  button.setAttribute("aria-pressed", String(isDark));
+}
+
+function renderConfig(config) {
+  const title = config.title || "Time Viewer";
+  const clocks = Array.isArray(config.clocks) ? config.clocks : [];
+
+  document.title = title;
+  document.querySelector("#viewerTitle").textContent = title;
+  document.querySelector("#cetChangeNote").hidden = config.showCetTransitionInfo === false;
+
+  const rows = document.querySelector("#clockRows");
+  rows.innerHTML = "";
+
+  if (!clocks.length) {
+    rows.innerHTML = '<tr><td colspan="3" class="config-error">No clocks are configured.</td></tr>';
+    return;
+  }
+
+  for (const clock of clocks) {
+    validateUtcSetting(clock.UTC);
+
+    const row = document.createElement("tr");
+    const country = document.createElement("td");
+    const time = document.createElement("td");
+    const currentDate = document.createElement("td");
+    const timeInput = document.createElement("input");
+    const dateInput = document.createElement("input");
+
+    country.textContent = clock.label || clock.UTC;
+    timeInput.type = "text";
+    timeInput.size = 10;
+    timeInput.readOnly = true;
+    timeInput.className = "time-field";
+    timeInput.dataset.utc = clock.UTC;
+    timeInput.dataset.clockField = "time";
+    timeInput.dataset.hour12 = clock.hour12 === false ? "false" : "true";
+
+    dateInput.type = "text";
+    dateInput.size = 18;
+    dateInput.readOnly = true;
+    dateInput.className = "date-field";
+    dateInput.dataset.utc = clock.UTC;
+    dateInput.dataset.clockField = "date";
+
+    time.append(timeInput);
+    currentDate.append(dateInput);
+    row.append(country, time, currentDate);
+    rows.append(row);
+  }
+}
+
+function validateUtcSetting(utcValue) {
+  if (!getDynamicUtcZone(utcValue) && Number.isNaN(parseUtcOffsetMinutes(utcValue))) {
+    throw new Error(`Invalid UTC value in ${CONFIG_FILE}: ${utcValue}. Use values like +1, -4, +5:30, or CET/CEST.`);
+  }
+}
+
+function updateClocks() {
+  const now = new Date();
+  document.querySelectorAll('input[data-clock-field="time"]').forEach((input) => {
+    input.value = formatUtcTime(now, input.dataset.utc, input.dataset.hour12 !== "false");
+  });
+  document.querySelectorAll('input[data-clock-field="date"]').forEach((input) => {
+    input.value = formatUtcDate(now, input.dataset.utc);
+  });
+}
+
+function formatUtcTime(date, utcValue, hour12) {
+  const dynamicZone = getDynamicUtcZone(utcValue);
+  if (dynamicZone) {
+    return formatTimeZoneTime(date, dynamicZone, hour12);
+  }
+
+  const utcDate = new Date(date.getTime() + parseUtcOffsetMinutes(utcValue) * 60000);
+  return formatOffsetTime(utcDate, hour12);
+}
+
+function formatUtcDate(date, utcValue) {
+  const dynamicZone = getDynamicUtcZone(utcValue);
+  if (dynamicZone) {
+    return formatTimeZoneDate(date, dynamicZone);
+  }
+
+  const utcDate = new Date(date.getTime() + parseUtcOffsetMinutes(utcValue) * 60000);
+  return formatOffsetDate(utcDate);
+}
+
+function formatTimeZoneTime(date, timeZone, hour12) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12
+  }).format(date);
+}
+
+function formatTimeZoneDate(date, timeZone) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  }).format(date);
+}
+
+function formatOffsetTime(date, hour12) {
+  const hours24 = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+
+  if (!hour12) {
+    return `${String(hours24).padStart(2, "0")}:${minutes}:${seconds}`;
+  }
+
+  const suffix = hours24 >= 12 ? "PM" : "AM";
+  const hours12 = hours24 % 12 || 12;
+  return `${hours12}:${minutes}:${seconds} ${suffix}`;
+}
+
+function formatOffsetDate(date) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  }).format(date);
+}
+
+function getDynamicUtcZone(utcValue) {
+  return DYNAMIC_UTC_ZONES[String(utcValue || "").toUpperCase()] || null;
+}
+
+function parseUtcOffsetMinutes(utcValue) {
+  const match = String(utcValue || "").trim().match(/^([+-])(\d{1,2})(?::?(\d{2}))?$/);
+  if (!match) {
+    return NaN;
+  }
+
+  const sign = match[1] === "-" ? -1 : 1;
+  const hours = Number(match[2]);
+  const minutes = Number(match[3] || 0);
+
+  if (hours > 14 || minutes > 59) {
+    return NaN;
+  }
+
+  return sign * (hours * 60 + minutes);
+}
+
+function renderCetChangeNote(now) {
+  const note = document.querySelector("#cetChangeNote");
+  const year = now.getFullYear();
+  const startDate = getLastSundayOfMonth(year, 2);
+  const endDate = getLastSundayOfMonth(year, 9);
+  const nextChangeDate = now < startDate ? startDate : now < endDate ? endDate : getLastSundayOfMonth(year + 1, 2);
+  const nextChangeLabel = nextChangeDate.getFullYear() === year ? "Next change this year" : "Next change";
+  const currentName = getCetAbbreviation(now);
+
+  note.innerHTML = `
+    <strong>CET/CEST change dates for ${year} (${currentName} now)</strong>
+    <span class="cet-change-line">CEST starts on ${formatTransitionDate(startDate)} at 01:00 UTC (02:00 CET becomes 03:00 CEST).</span>
+    <span class="cet-change-line">CET resumes on ${formatTransitionDate(endDate)} at 01:00 UTC (03:00 CEST becomes 02:00 CET).</span>
+    <span class="cet-change-line">${nextChangeLabel}: ${formatTransitionDate(nextChangeDate)} at 01:00 UTC.</span>
+  `;
+}
+
+function getCetAbbreviation(date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: CET_ZONE,
+    timeZoneName: "shortOffset",
+    hour: "2-digit"
+  }).formatToParts(date);
+  const offset = parts.find((part) => part.type === "timeZoneName")?.value;
+  return offset === "GMT+2" ? "CEST" : "CET";
+}
+
+function getLastSundayOfMonth(year, monthIndex) {
+  const date = new Date(Date.UTC(year, monthIndex + 1, 0, 1, 0, 0));
+  date.setUTCDate(date.getUTCDate() - date.getUTCDay());
+  return date;
+}
+
+function formatTransitionDate(date) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }).format(date);
+}
+
+function startClock(config) {
+  timeViewerConfig = config;
+  renderConfig(timeViewerConfig);
+  renderCetChangeNote(new Date());
+  updateClocks();
+
+  if (timerId) {
+    window.clearInterval(timerId);
+  }
+
+  timerId = window.setInterval(() => {
+    renderCetChangeNote(new Date());
+    updateClocks();
+  }, 1000);
+}
+
+function showError(error) {
+  document.querySelector("#clockRows").innerHTML = `<tr><td colspan="3" class="config-error">${error.message}</td></tr>`;
+}
+
+function start() {
+  try {
+    if (!window.TIME_VIEWER_CONFIG) {
+      throw new Error(`Unable to load ${CONFIG_FILE}. Keep it in the same folder as this HTML file.`);
+    }
+
+    startClock(window.TIME_VIEWER_CONFIG);
+  } catch (error) {
+    showError(error);
+  }
+}
+
+loadTheme();
+start();
+</script>
+</body>
+</html>
+
+
