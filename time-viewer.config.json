@@ -13,74 +13,74 @@ window.TIME_VIEWER_CONFIG = {
     {
       "label": "Noida",
       "UTC": "+5:30"
-    },
-    {
-      "label": "Mexico",
-      "UTC": "-6"
-    },
-    {
-      "label": "ABN",
-      "UTC": "+1"
-    },
-    {
-      "label": "ADIA",
-      "UTC": "+4"
-    },
-    {
-      "label": "BALO",
-      "UTC": "+1"
-    },
-    {
-      "label": "Comgest",
-      "UTC": "+1"
-    },
-    {
-      "label": "GAMH",
-      "UTC": "+1"
-    },
-    {
-      "label": "IAS",
-      "UTC": "+1"
-    },
-    {
-      "label": "INKA",
-      "UTC": "+1"
-    },
-    {
-      "label": "IOS",
-      "UTC": "-5"
-    },
-    {
-      "label": "KLP",
-      "UTC": "+1"
-    },
-    {
-      "label": "LGTCP",
-      "UTC": "+1"
-    },
-    {
-      "label": "NYKR",
-      "UTC": "+1"
-    },
-    {
-      "label": "QAM",
-      "UTC": "+1"
-    },
-    {
-      "label": "SIS",
-      "UTC": "+9"
-    },
-    {
-      "label": "SWIB",
-      "UTC": "-6"
-    },
-    {
-      "label": "SYMT",
-      "UTC": "-5"
-    },
-    {
-      "label": "ZIC",
-      "UTC": "+1"
     }
+    // {
+    //   "label": "Mexico",
+    //   "UTC": "-6"
+    // },
+    // {
+    //   "label": "ABN",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "ADIA",
+    //   "UTC": "+4"
+    // },
+    // {
+    //   "label": "BALO",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "Comgest",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "GAMH",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "IAS",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "INKA",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "IOS",
+    //   "UTC": "-5"
+    // },
+    // {
+    //   "label": "KLP",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "LGTCP",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "NYKR",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "QAM",
+    //   "UTC": "+1"
+    // },
+    // {
+    //   "label": "SIS",
+    //   "UTC": "+9"
+    // },
+    // {
+    //   "label": "SWIB",
+    //   "UTC": "-6"
+    // },
+    // {
+    //   "label": "SYMT",
+    //   "UTC": "-5"
+    // },
+    // {
+    //   "label": "ZIC",
+    //   "UTC": "+1"
+    // }
   ]
 };
